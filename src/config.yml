@@ -2,4 +2,4 @@ server: localhost
 port: 3306
 user: root
 database: stm
-password: Felix0299
+password: password
