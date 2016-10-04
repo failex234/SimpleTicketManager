@@ -1,0 +1,19 @@
+name: SimpleTicketManager
+author: failexy0
+main: de.failexy0.femo.simpleticketmanager.Main
+version: 3.1.2
+url: emilnaumann.de
+commands:
+     ticket:
+      description: Main command to compose and review a ticket
+      
+permissions:
+      ticket.compose:
+       description: Permission to compose a ticket.
+      ticket.review:
+       description: Permission to review a ticket.
+       default: op
+      ticket.list:
+       description: Perm to list all non reviewed tickets
+      ticket.stats:
+       description: View ticket statistics about a player

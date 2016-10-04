@@ -1,0 +1,13 @@
+com.google.gson
+com.google.gson.annotations
+com.google.gson.internal
+com.google.gson.internal.bind
+com.google.gson.internal.bind.util
+com.google.gson.reflect
+com.google.gson.stream
+com.huskehhh.mysql
+com.huskehhh.mysql.mysql
+com.huskehhh.mysql.sqlite
+de.failexy0.femo.simpleticketmanager
+mkremins.fanciful
+net.amoebaman.util
