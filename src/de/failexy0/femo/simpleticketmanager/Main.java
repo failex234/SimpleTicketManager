@@ -1,41 +1,16 @@
 package de.failexy0.femo.simpleticketmanager;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import de.failexy0.femo.simpleticketmanager.enums.Language;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.messaging.PluginMessageListener;
 
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import com.huskehhh.mysql.mysql.*;
-import com.huskehhh.mysql.sqlite.SQLite;
 
-import mkremins.fanciful.FancyMessage;
+import de.failexy0.femo.simpleticketmanager.commands.CMD_Ticket;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /*
  * SimpleTicketManager - created by failexy0 for FeMoCraft
@@ -49,6 +24,7 @@ import java.util.regex.Pattern;
 public class Main extends JavaPlugin {
 	
 	public static Main main;
+	public Language lang;
 	
 	
 	public String Name;
@@ -65,8 +41,13 @@ public class Main extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		main = this;
+		if (this.getConfig().getString("language").equals("de")) this.lang = Language.DE;
+		else
+		this.lang = Language.EN;
+		System.out.println("LANGUAGE IS " + lang);
 		this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 		this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", pml);
+		this.getCommand("ticket").setExecutor(new CMD_Ticket());
 		File config = new File(this.getDataFolder(), "config.yml");
 		if (!config.exists()) {
 			this.getConfig().options().copyDefaults(true);
@@ -96,6 +77,12 @@ public class Main extends JavaPlugin {
 			this.getServer().getPluginManager().disablePlugin(this);
 			e.printStackTrace();
 		}
+	}
+	
+	public void updateLanguage() {
+		if (this.getConfig().getString("language").equals("de")) this.lang = Language.DE;
+		else
+			this.lang = Language.EN;
 	}
 
 

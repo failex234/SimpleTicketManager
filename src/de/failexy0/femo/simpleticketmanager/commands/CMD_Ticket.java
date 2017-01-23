@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.failexy0.femo.simpleticketmanager.enums.Language;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -20,12 +21,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import de.failexy0.femo.simpleticketmanager.Main;
+import de.failexy0.femo.simpleticketmanager.enums.Messages;
 import de.failexy0.femo.simpleticketmanager.sender.ServerMessageSender;
 import mkremins.fanciful.FancyMessage;
 
 public class CMD_Ticket implements CommandExecutor {
 
 	ServerMessageSender sms = new ServerMessageSender();
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		Player p = (Player) sender;
@@ -33,17 +36,16 @@ public class CMD_Ticket implements CommandExecutor {
 			// If no args are given
 			if (args.length == 0) {
 				if (!p.hasPermission("ticket.list")) {
-					p.sendMessage(ChatColor.RED + "Too few arguments, please type /ticket <compose|status>");
+					p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_NOPERM.getMSG());
 				} else if (!p.hasPermission("ticket.review")) {
-					p.sendMessage(ChatColor.RED + "Too few arguments, please type /ticket <compose|status|list|>");
+					p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_LISTPERM.getMSG());
 				} else {
-					p.sendMessage(
-							ChatColor.RED + "Too few arguments, please do /ticket <compose|status|review|list|stats>");
+					p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_FULLPERM.getMSG());
 				}
 				// if the first arg is "compose"
 			} else if (args[0].equalsIgnoreCase("compose")) {
 				if (args.length == 1) {
-					p.sendMessage(ChatColor.RED + "Please also write a message: /ticket compose <message>");
+					p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_MSGREQUIRED.getMSG());
 				} else {
 					Statement statement;
 					try {
@@ -56,8 +58,7 @@ public class CMD_Ticket implements CommandExecutor {
 						// This string just gets used to trigger an exception,
 						// if the query is empty
 						String test = res.getString("Name");
-						p.sendMessage(ChatColor.RED
-								+ "Sorry but it seem that you've already composed a ticket. Please wait until your ticket gets reviewed!");
+						p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_ALREADYCOMPOSED.getMSG());
 					} catch (SQLException e) {
 						// If sender is not found in db, an exception gets
 						// caught and the ticket gets saved in the db.
@@ -76,12 +77,14 @@ public class CMD_Ticket implements CommandExecutor {
 						// the permission "ticket.review"
 						Bukkit.broadcast(ChatColor.RED + "----------" + ChatColor.YELLOW + "Ticket System"
 								+ ChatColor.RED + "----------", "ticket.review");
-						Bukkit.broadcast(ChatColor.BOLD + "" + ChatColor.RED + "Ticket from: " + ChatColor.YELLOW
-								+ p.getName(), "ticket.review");
+						Bukkit.broadcast(
+								ChatColor.BOLD + Messages.STM_TICKETBY.getMSG() + ChatColor.YELLOW + p.getName(),
+								"ticket.review");
 						Bukkit.broadcast(
 								ChatColor.BOLD + "" + ChatColor.RED + "UUID: " + ChatColor.YELLOW + p.getUniqueId(),
 								"ticket.review");
-						Bukkit.broadcast(ChatColor.RED + "Message: " + ChatColor.YELLOW + myString, "ticket.review");
+						Bukkit.broadcast(Messages.STM_TICKETMSG.getMSG() + ChatColor.YELLOW + myString,
+								"ticket.review");
 						Bukkit.broadcast(
 								ChatColor.RED + "Server: " + ChatColor.YELLOW + Main.main.getServer().getServerName(),
 								"ticket.review");
@@ -90,12 +93,13 @@ public class CMD_Ticket implements CommandExecutor {
 						for (int i = 0; i < onlinePlayers1.size(); i++) {
 							Cpl = (Player) onlinePlayers1.toArray()[i];
 							if (Cpl.hasPermission("ticket.review")) {
-								new FancyMessage("Click here to review this tickez").color(ChatColor.GREEN)
-										.tooltip("Click to review").command("/ticket review " + p.getUniqueId())
-										.send(Cpl);
+								new FancyMessage(Messages.STM_CLICKTOREVIEW.getMSG()).color(ChatColor.GREEN)
+										.tooltip(Messages.STM_CLICKTOREVIEWTOOLTIP.getMSG())
+										.command("/ticket review " + p.getUniqueId()).send(Cpl);
 							}
 						}
-						//One measure to prevent SQL Injection even though you can't really do something.
+						// One measure to prevent SQL Injection even though you
+						// can't really do something.
 						myString = myString.replace("'", "{SEMICOLON}");
 						sms.BungeeMessageSender(sender, p.getName(), p.getUniqueId().toString(), myString,
 								Main.main.getServer().getServerName());
@@ -126,14 +130,9 @@ public class CMD_Ticket implements CommandExecutor {
 							} catch (SQLException eSQL) {
 								statement.executeUpdate(
 										"INSERT INTO ticketsystem_player (`Name`, `UUID`, `Letztes_Ticket`, `Anzahl_Tickets`) VALUES ('"
-												+ p.getName() + "','" + p.getUniqueId() + "','" + datum
-												+ "', 1);");
+												+ p.getName() + "','" + p.getUniqueId() + "','" + datum + "', 1);");
 							}
-							p.sendMessage(ChatColor.RED + "Thank you! Your ticket was saved in the" + ChatColor.YELLOW
-									+ " database" + ChatColor.RED
-									+ " and will be reviewed by us as soon as possible. " + ChatColor.YELLOW
-									+ " Every online staff-member " + ChatColor.RED
-									+ " will get your ticket right-away.");
+							p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_TICKETCOMPOSED.getMSG());
 						} catch (SQLException f) {
 							f.printStackTrace();
 						}
@@ -143,8 +142,7 @@ public class CMD_Ticket implements CommandExecutor {
 				// Check if first arg is "review"
 			} else if (args[0].equalsIgnoreCase("review")) {
 				if (p.hasPermission("ticket.review") && args.length == 1) {
-					p.sendMessage(
-							ChatColor.RED + "You have to give a playername: /ticket review <playername|UUID>");
+					p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_PLAYERIDMISSING.getMSG());
 				} else if (p.hasPermission("ticket.review")) {
 					// Execute if sender has the permission node "ticket.review"
 					// retrieve from MySQL Table Code here, retrieve Username,
@@ -158,26 +156,27 @@ public class CMD_Ticket implements CommandExecutor {
 						Main.main.Name = res.getString("Name");
 						String msg = res.getString("Nachricht").replace("{SEMICOLON}", "'");
 						String UUIDD = res.getString("UUID");
-						p.sendMessage(ChatColor.RED + "----------" + ChatColor.YELLOW + "Ticket System"
-								+ ChatColor.RED + "----------");
-						p.sendMessage(ChatColor.RED + "Ticket from: " + ChatColor.YELLOW + res.getString("Name"));
+						p.sendMessage(ChatColor.RED + "----------" + ChatColor.YELLOW + "Ticket System" + ChatColor.RED
+								+ "----------");
+						p.sendMessage(Messages.STM_TICKETBY.getMSG() + ChatColor.YELLOW + res.getString("Name"));
 						p.sendMessage(ChatColor.RED + "UUID: " + ChatColor.YELLOW + UUIDD);
-						p.sendMessage(ChatColor.RED + "Message: " + ChatColor.YELLOW + msg);
-						p.sendMessage(ChatColor.RED + "Date: " + ChatColor.YELLOW + res.getString("datum"));
+						p.sendMessage(Messages.STM_TICKETMSG.getMSG() + ChatColor.YELLOW + msg);
+						p.sendMessage(Messages.STM_TICKETDATE.getMSG() + ChatColor.YELLOW + res.getString("datum"));
 						p.sendMessage(ChatColor.RED + "Server: " + ChatColor.YELLOW + res.getString("srv"));
-						p.sendMessage(ChatColor.RED + "----------" + ChatColor.YELLOW + "Ticket System"
-								+ ChatColor.RED + "----------");
+						p.sendMessage(ChatColor.RED + "----------" + ChatColor.YELLOW + "Ticket System" + ChatColor.RED
+								+ "----------");
 						statement
 								.executeUpdate("DELETE FROM ticketsystem WHERE UUID = '" + res.getString("UUID") + "'");
-						p.sendMessage(ChatColor.GREEN + "Ticket was deleted successfully");
+						p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_TICKETDELETEDSUCCESS.getMSG());
 						Bukkit.broadcast(
-								ChatColor.GREEN + p.getName() + " has just reviewed the ticket of " + Main.main.Name,
+								Messages.PREFIX.getMSG() + Messages.STM_TICKETREVIEWEDSTAFF.getMSG()
+										.replace("{reviewer}", p.getName().replace("{user}", Main.main.Name)),
 								"ticket.review");
 						UUID ui = UUID.fromString(UUIDD);
 						String pl = Bukkit.getPlayer(ui).getName();
 						Player pll = Bukkit.getServer().getPlayer(pl);
-						pll.sendMessage(
-								ChatColor.GREEN + "Your Ticket just got reviewed by " + p.getName() + "!");
+						pll.sendMessage(Messages.PREFIX.getMSG()
+								+ Messages.STM_TICKETREVIEWEDUSER.getMSG().replace("{reviewer}", p.getName()));
 						// statement.executeUpdate("UPDATE `ticketsystem` SET
 						// `reviewed` = null WHERE Name = '"+ args[1] +"'");
 						// Sends a message to all online players that have the
@@ -193,36 +192,37 @@ public class CMD_Ticket implements CommandExecutor {
 							String msg = res2.getString("Nachricht").replace("{SEMICOLON}", "'");
 							p.sendMessage(ChatColor.RED + "----------" + ChatColor.YELLOW + "Ticket System"
 									+ ChatColor.RED + "----------");
-							p.sendMessage(ChatColor.RED + "Ticket from: " + ChatColor.YELLOW + res2.getString("Name"));
+							p.sendMessage(Messages.STM_TICKETBY.getMSG() + ChatColor.YELLOW + res2.getString("Name"));
 							p.sendMessage(ChatColor.RED + "UUID: " + ChatColor.YELLOW + res2.getString("UUID"));
+							p.sendMessage(Messages.STM_TICKETMSG.getMSG() + ChatColor.YELLOW + msg);
 							p.sendMessage(
-									ChatColor.RED + "Message: " + ChatColor.YELLOW + msg);
-							p.sendMessage(ChatColor.RED + "Date: " + ChatColor.YELLOW + res2.getString("datum"));
+									Messages.STM_TICKETDATE.getMSG() + ChatColor.YELLOW + res2.getString("datum"));
 							p.sendMessage(ChatColor.RED + "Server: " + ChatColor.YELLOW + res2.getString("srv"));
 							p.sendMessage(ChatColor.RED + "----------" + ChatColor.YELLOW + "Ticket System"
 									+ ChatColor.RED + "----------");
 							UUID ui = UUID.fromString(res2.getString("UUID"));
 							statement.executeUpdate("DELETE FROM ticketsystem WHERE UUID = '" + args[1] + "'");
-							p.sendMessage(ChatColor.GREEN + "Ticket was deleted successfully");
+							p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_TICKETDELETEDSUCCESS.getMSG());
 							String pl = Bukkit.getPlayer(ui).getName();
 							Player pll = Bukkit.getServer().getPlayer(pl);
-							pll.sendMessage(ChatColor.GREEN + "Your Ticket just got reviewed by "
-									+ p.getName() + "!");
+							pll.sendMessage(Messages.PREFIX.getMSG()
+									+ Messages.STM_TICKETREVIEWEDUSER.getMSG().replace("{reviewer}", p.getName()));
 							// Sends a message to all online players that have
 							// the permission "ticket.review"
-							Bukkit.broadcast(ChatColor.GREEN + p.getName() + " just reviewed the ticket from "
-									+ Name1 + " reviewed.", "ticket.review");
+							Bukkit.broadcast(
+									Messages.PREFIX.getMSG() + Messages.STM_TICKETREVIEWEDSTAFF.getMSG()
+											.replace("{reviewer}", p.getName().replace("{user}", Name1)),
+									"ticket.review");
 						} catch (SQLException ef) {
 							// Sender has to look into the console because of
 							// the stacktrace
-							p.sendMessage(ChatColor.RED
-									+ "Cannot get data for some reason. Maybe this person has not submitted a ticket. Please take a look into the console if you can!");
+							p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_CANTRECIEVEDATA.getMSG());
 							ef.printStackTrace();
 						} catch (NullPointerException npef) {
 						}
 					}
 				} else if (!p.hasPermission("ticket.review")) {
-					p.sendMessage(ChatColor.RED + "Sorry but it seems you're not permitted to do that!");
+					p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_NOPERM.getMSG());
 				}
 			} else if (args[0].equalsIgnoreCase("status")) {
 				Statement statement;
@@ -234,23 +234,22 @@ public class CMD_Ticket implements CommandExecutor {
 					// This string just gets used to trigger an exception, if
 					// the query is empty
 					String test = res.getString("Name");
-					p.sendMessage(ChatColor.RED
-							+ "Your Ticket isn't reviewed yet.");
+					p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_TICKETNOTREVIWEDSTATUS.getMSG());
 				} catch (SQLException e) {
-					p.sendMessage(ChatColor.GREEN + "Your Ticket got reviewed");
+					p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_TICKETREVIWEDSTATUS.getMSG());
 				}
 
 			} else if (args[0].equalsIgnoreCase("list")) {
 				if (!p.hasPermission("ticket.list")) {
-					p.sendMessage(ChatColor.RED + "Sorry but it seems you're not permitted to do that!");
+					p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_NOPERM.getMSG());
 				} else {
 					PreparedStatement sql;
 					try {
 						/*
 						 * --------------------------------------- This code is
 						 * by McMedia! http://dev.bukkit.org/mcmedia/ <-
-						 * ---------------------------------------
-						 * Sadly he wasn't online since May 2015 :(
+						 * --------------------------------------- Sadly he
+						 * wasn't online since May 2015 :(
 						 * --------------------------------------- I was too
 						 * lazy to come up with my own solution :D Just blame me
 						 */
@@ -260,16 +259,17 @@ public class CMD_Ticket implements CommandExecutor {
 						for (; result.next(); sb.append(
 								(new StringBuilder(String.valueOf(result.getString("Name")))).append(", ").toString()))
 							;
-						String BannedPlayers = sb.toString();
+						String NewTickets = sb.toString();
 						Pattern pattern = Pattern.compile(", $");
-						Matcher matcher = pattern.matcher(BannedPlayers);
-						BannedPlayers = matcher.replaceAll("");
-						if (BannedPlayers.equals("")) {
-							sender.sendMessage(ChatColor.GREEN + "No new tickets");
+						Matcher matcher = pattern.matcher(NewTickets);
+						NewTickets = matcher.replaceAll("");
+						if (NewTickets.equals("")) {
+							sender.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_NONEWTICKETS.getMSG());
 						} else {
-							sender.sendMessage((new StringBuilder()).append(ChatColor.GOLD)
-									.append("There are new tickets from:").toString());
-							sender.sendMessage((new StringBuilder()).append(ChatColor.RED).append(BannedPlayers)
+							sender.sendMessage((new StringBuilder())
+									.append(Messages.PREFIX.getMSG() + Messages.STM_NEWTICKETSFROM.getMSG())
+									.toString());
+							sender.sendMessage((new StringBuilder()).append(ChatColor.RED).append(NewTickets)
 									.append(".").toString());
 						}
 					} catch (SQLException e) {
@@ -279,7 +279,7 @@ public class CMD_Ticket implements CommandExecutor {
 				}
 			} else if (args[0].equalsIgnoreCase("stats")) {
 				if (!p.hasPermission("ticket.stats")) {
-					p.sendMessage(ChatColor.RED + "Sorry but it seems you're not permitted to do that!");
+					p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_NOPERM.getMSG());
 				} else {
 					if (args.length == 1) {
 						Statement statement;
@@ -289,14 +289,15 @@ public class CMD_Ticket implements CommandExecutor {
 									"select * from ticketsystem_player where UUID = '" + p.getUniqueId() + "';");
 							res.next();
 							Main.main.Name = res.getString("Name");
-							p.sendMessage(ChatColor.YELLOW + "Stats from " + res.getString("Name") + " (You):");
-							p.sendMessage(ChatColor.RED + "Number of composed tickets: " + ChatColor.GOLD + "'"
+							p.sendMessage(Messages.STM_STATSFROM.getMSG() + res.getString("Name")
+									+ Messages.STM_YOU.getMSG());
+							p.sendMessage(Messages.STM_NUMBERCOMPOSEDTICKETS.getMSG() + ChatColor.GOLD + "'"
 									+ res.getInt("Anzahl_Tickets") + "'");
-							p.sendMessage(ChatColor.RED + "Last ticket composed on: " + ChatColor.GOLD + "'"
+							p.sendMessage(Messages.STM_LASTTICKETCOMPOSEDDATE.getMSG() + ChatColor.GOLD + "'"
 									+ res.getString("Letztes_Ticket") + "'");
 							p.sendMessage(ChatColor.YELLOW + "UUID: " + res.getString("UUID"));
 						} catch (SQLException e) {
-							p.sendMessage(ChatColor.RED + "I can't find you in the database");
+							p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_NOTFOUNDINDBYOU.getMSG());
 						}
 
 					} else {
@@ -307,17 +308,51 @@ public class CMD_Ticket implements CommandExecutor {
 									"select * from ticketsystem_player where Name LIKE '%" + args[1] + "%';");
 							res.next();
 							Main.main.Name = res.getString("Name");
-							p.sendMessage(ChatColor.YELLOW + "Stats from " + args[1] + ":");
-							p.sendMessage(ChatColor.RED + "Number of composed tickets: " + ChatColor.GOLD + "'"
+							p.sendMessage(Messages.STM_STATSFROM.getMSG() + args[1] + ":");
+							p.sendMessage(Messages.STM_NUMBERCOMPOSEDTICKETS.getMSG() + ChatColor.GOLD + "'"
 									+ res.getInt("Anzahl_Tickets") + "'");
-							p.sendMessage(ChatColor.RED + "Last ticket composed on: " + ChatColor.GOLD + "'"
+							p.sendMessage(Messages.STM_LASTTICKETCOMPOSEDDATE.getMSG() + ChatColor.GOLD + "'"
 									+ res.getString("Letztes_Ticket") + "'");
 							p.sendMessage(ChatColor.YELLOW + "UUID: " + res.getString("UUID"));
 						} catch (SQLException e) {
-							p.sendMessage(ChatColor.RED + "I can't find that player in the database.");
+							p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_NOTFOUNFINDBPLAYER.getMSG());
 						}
 					}
 
+				}
+			} else if (args[0].equalsIgnoreCase("reload")) {
+				Main.main.reloadConfig();
+				Main.main.updateLanguage();
+				p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_RELOADED.getMSG());
+			} else if (args[0].equalsIgnoreCase("language") || args[0].equals("lang")) {
+				if (args.length == 1) {
+					p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_GIVELANG.getMSG());
+				} else {
+					if (args[1].equals("de")) {
+						if (Main.main.lang.equals("de")) {
+							p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_LANGALREADYSET.getMSG().replace("{lang}", "de"));
+						} else {
+							Main.main.lang = Language.DE;
+							Main.main.getConfig().set("language", "de");
+							Main.main.saveConfig();
+							Main.main.reloadConfig();
+							p.sendMessage(Messages.PREFIX.getMSG()
+									+ Messages.STM_CHANGELANG.getMSG().replace("{lang}", "de"));
+						}
+					} else if (args[1].equals("en")) {
+						if (Main.main.lang.equals("en")) {
+							p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_LANGALREADYSET.getMSG().replace("{lang}", "en"));
+						} else {
+							Main.main.lang = Language.EN;
+							Main.main.getConfig().set("language", "en");
+							Main.main.saveConfig();
+							Main.main.reloadConfig();
+							p.sendMessage(Messages.PREFIX.getMSG()
+									+ Messages.STM_CHANGELANG.getMSG().replace("{lang}", "en"));
+						}
+					} else {
+						p.sendMessage(Messages.PREFIX.getMSG() + Messages.STM_LANGNOTFOUND.getMSG().replace("{lang}", args[1]));
+					}
 				}
 			}
 		}
