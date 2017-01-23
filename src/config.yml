@@ -3,3 +3,5 @@ port: 3306
 user: root
 database: stm
 password: password
+language: de
+

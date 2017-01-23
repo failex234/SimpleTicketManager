@@ -6,6 +6,7 @@ url: emilnaumann.de
 commands:
      ticket:
       description: Main command to compose and review a ticket
+      aliases: t
       
 permissions:
       ticket.compose:
