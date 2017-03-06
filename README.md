@@ -8,9 +8,9 @@ Yes I know! It's not beautiful nor is it in any way programmed appropiatly but r
 - /ticket compose \<message> - Composes a new ticket. Only composes if your last composed ticket got reviewed.
 - /ticket status - Tells the player if their ticket got reviewed or not.
 - /ticket list - Lists all non-reviewed tickets
-- /ticket review <playername|UUID> - Reviews the ticket of that player with that name/UUID.
+- /ticket review \<playername|UUID> - Reviews the ticket of that player with that name/UUID.
 - /ticket stats - Shows your ticket stats.
-- /ticket <name|UUID> - Shows the ticket stats of the player with that name/UUID.
+- /ticket \<name|UUID> - Shows the ticket stats of the player with that name/UUID.
 
 #Features
 - Tickets get saved in the MySQL database.
