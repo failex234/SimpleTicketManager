@@ -5,7 +5,7 @@ of my wonderful java programming journey.
 Yes I know! It's not beautiful nor is it in any way programmed appropiatly but remember, these were my first days!
 
 #Commands
-- /ticket compose <message> - Composes a new ticket. Only composes if your last composed ticket got reviewed.
+- /ticket compose \<message> - Composes a new ticket. Only composes if your last composed ticket got reviewed.
 - /ticket status - Tells the player if their ticket got reviewed or not.
 - /ticket list - Lists all non-reviewed tickets
 - /ticket review <playername|UUID> - Reviews the ticket of that player with that name/UUID.
