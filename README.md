@@ -9,7 +9,7 @@ Yes I know! It's not beautiful nor is it in any way programmed appropiatly but r
 - /ticket status - Tells the player if their ticket got reviewed or not.
 - /ticket list - Lists all non-reviewed tickets
 - /ticket review \<playername|UUID> - Reviews the ticket of that player with that name/UUID.
-- /ticket stats - Shows your ticket stats.
+- /ticket stats | /ticket stats \<name> - Shows your ticket stats or ticket stats from name.
 - /ticket \<name|UUID> - Shows the ticket stats of the player with that name/UUID.
 
 #Features
