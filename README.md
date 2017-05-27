@@ -1,8 +1,9 @@
 # SimpleTicketManager
 This is a little project I have been working on in the beginning
-of my wonderful java programming journey.
+of my wonderful Java programming journey.
 
 Yes I know! It's not beautiful nor is it in any way programmed appropiatly but remember, these were my first days!
+I will update this code soon to fully complete this project. 
 
 # Commands
 - /ticket compose \<message> - Composes a new ticket. Only composes if your last composed ticket got reviewed.
